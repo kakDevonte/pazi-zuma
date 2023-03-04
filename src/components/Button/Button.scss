@@ -1,0 +1,22 @@
+.button {
+  border: 2px solid #ffffff;
+  width: 100%;
+  border-radius: 35px;
+  padding: 0.9em;
+  font-family: Montserrat ExtraBoldItalic;
+  font-size: 1.1em;
+  color: #ffffff;
+  overflow: hidden;
+  z-index: 2;
+  background: linear-gradient(89.77deg, #E083FF 0.16%, #6023E1 99.84%),
+  linear-gradient(0deg, #FFFFFF, #FFFFFF);
+  transition: 300ms;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  &:active {
+    transform: scale(.95);
+  }
+}

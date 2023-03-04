@@ -1,0 +1,43 @@
+.cards {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5%;
+}
+
+
+.cards-logo {
+  z-index: 2;
+  width: 24em;
+}
+
+.cards-content {
+  z-index: 2;
+  display: grid;
+  width: 100%;
+
+  grid-template-columns: repeat(3, 1fr);
+  grid-column-gap: 30px;
+  grid-row-gap: 12px;
+}
+.cards-bot {
+  position: absolute;
+  width: 100vw;
+  height: 30%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 87%;
+  background: linear-gradient(360deg, #19153E 0%, rgba(26, 22, 63, 0) 100%);
+}
+
+.cards-top {
+  position: absolute;
+  width: 100vw;
+  height: 70%;
+  transform: translateX(-50%);
+  left: 50%;
+  top: 0;
+  background: linear-gradient(180deg, #19153E 15.08%, rgba(25, 21, 62, 0.86) 40.75%, rgba(26, 22, 63, 0) 100%);
+
+}

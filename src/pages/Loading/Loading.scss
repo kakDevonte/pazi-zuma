@@ -1,0 +1,100 @@
+.load-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.load-logo {
+  position: absolute;
+  width: 25em;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 15%;
+}
+
+.load-bot {
+  position: absolute;
+  width: 100vw;
+  height: 30%;
+  transform: translate(-50%, -50%);
+  left: 50%;
+  top: 87%;
+  background: linear-gradient(360deg, #19153E 0%, rgba(26, 22, 63, 0) 100%);
+}
+
+.load-text {
+  color: white;
+  position: absolute;
+  left: 50%;
+  top: 90%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+
+  font-size: 1.2em;
+  font-family: 'Montserrat Extra Bold';
+  font-weight: bold;
+  font-style: italic;
+}
+
+.load-bar {
+  left: 50%;
+  top: 90%;
+  transform: translate(-50%, -50%);
+  border: 2px solid #ffffff;
+  //background: #ffffff;
+  border-radius: 25px;
+  width: 90%;
+  height: 3em;
+  position: absolute;
+  overflow: hidden;
+  font-family: "Roboto", sans-serif;
+  z-index: 2;
+  background: linear-gradient(89.77deg, #E083FF 0.16%, #6023E1 99.84%),
+  linear-gradient(0deg, #FFFFFF, #FFFFFF);
+
+}
+
+.load-bar-anim {
+  transition: none 0s ease 0s;
+  width: 100%;
+  height: 100%;
+  background-image: -webkit-linear-gradient(135deg, rgba(224, 131, 255, 1) 25%, transparent 25%, transparent 50%, rgba(224, 131, 255, 1) 50%, rgba(224, 131, 255, 1) 75%, transparent 75%, transparent);
+  background-image: linear-gradient(-45deg, rgba(224, 131, 255, 1) 25%, transparent 25%, transparent 50%, rgba(224, 131, 255, 1) 50%, rgba(224, 131, 255, 1) 75%, transparent 75%, transparent);
+  background-size: 40px 40px;
+  -webkit-animation: cssProgressActive 2s linear infinite;
+  animation: cssProgressActive 2s linear infinite;
+}
+
+/* Must Include the animation below */
+@-webkit-keyframes cssProgressActive {
+  0% {
+    background-position:0 0
+  }
+  100% {
+    background-position:35px 35px
+  }
+}
+@keyframes cssProgressActive {
+  0% {
+    background-position:0 0
+  }
+  100% {
+    background-position:35px 35px
+  }
+}
+@-webkit-keyframes cssProgressActiveRight {
+  0% {
+    background-position:0 0
+  }
+  100% {
+    background-position:-35px -35px
+  }
+}
+@keyframes cssProgressActiveRight {
+  0% {
+    background-position:0 0
+  }
+  100% {
+    background-position:-35px -35px
+  }
+}
