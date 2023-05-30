@@ -12,6 +12,7 @@
 }
 
 .auth-btns {
+  z-index: 5;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -19,6 +20,7 @@
 }
 
 .auth-btn-container {
+  z-index: 5;
   width: 100%;
   display: flex;
   gap: 15px;

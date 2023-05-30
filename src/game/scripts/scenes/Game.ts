@@ -4,6 +4,9 @@ import Utils from "../data/Utils";
 import User from "../data/User";
 import Ball from "../components/Ball";
 import { store } from "../../../redux/store";
+import { upCard } from "../../../redux/game/asyncActions";
+import { Main } from "../../../pages/Main";
+const degreeCircle = require("degree-circle");
 
 // const sports = []
 
@@ -16,6 +19,10 @@ export default class Game extends Phaser.Scene {
   private numberBall!: number;
   private angle = 0;
   private timeEnd = 0;
+  private isNew = true;
+  private createBall = false;
+  private points = 0;
+  private currBall = 0;
   private x!: number;
   private y!: number;
   private radius!: number;
@@ -38,12 +45,14 @@ export default class Game extends Phaser.Scene {
     this.numberBall = 1;
     this.timeDelay = 0;
     this.radius = (width * 0.8) / 2;
+
     this.balls = [];
     this.ballsStat = [];
     this.physicsBalls = this.physics.add.group();
 
+    this.currBall = this.numberBall;
     const number = Utils.randomNumber(1, 6);
-    //const number = 1;
+
     const ball = new Ball(
       this,
       centerX,
@@ -63,9 +72,6 @@ export default class Game extends Phaser.Scene {
       level: 1,
     });
 
-    //  this.cursor = this.add.line(0, 0, 0, 0, 0, 0, 0x1a65ac, 0.5);
-    //  this.cursor.setLineWidth(1, 19);
-
     this.input.on("pointermove", (pointer: any) => {
       const mx = pointer.worldX - this.x;
       const my = pointer.worldY - this.y;
@@ -74,14 +80,10 @@ export default class Game extends Phaser.Scene {
     });
 
     this.input.on("pointerdown", (pointer: any) => {
-      if (this.balls.length >= 17) {
-        // setTimeout(() => {
-        //   store.dispatch({ type: "game/toggleEndGame" });
-        // }, 3000);
-        return;
-      }
-      this.numberBall += 1;
+      if (this.balls.length >= 17) return;
+      if (!this.isNew) return;
 
+      this.isNew = false;
       let x = pointer.worldX - this.cameras.main.centerX;
       let y = pointer.worldY - this.cameras.main.centerY;
       let angle = (180 / Math.PI) * Math.atan2(y, x);
@@ -94,54 +96,53 @@ export default class Game extends Phaser.Scene {
         this.cameras.main.centerY +
         this.radius * Math.sin(angle * (Math.PI / 180));
 
-      const ball = this.ballsStat.find((b) => b.start === false);
-
-      //const index = this.balls.length - 1;
-      const b = this.balls.find((b) => b.index === ball.index);
-      // this.ballsStat[index].angle = angle;
+      const newBall = this.ballsStat.find((b) => b.index === this.currBall);
+      const b = this.balls.find((b) => b.index === newBall.index);
 
       this.ballsStat = this.ballsStat.map((el) =>
-        el.index === ball.index ? { ...el, angle: angle } : el
+        el.index === newBall.index ? { ...el, angle: angle } : el
       );
-
       b.setCurrAngle(angle);
 
+      this.createBall = true;
       this.tweens.add({
         targets: b,
         y: y2,
         x: x2,
-        duration: 200,
+        duration: 250,
         ease: "Linear",
         onComplete: () => {
           this.ballsStat = this.ballsStat.map((el) =>
-            el.index === ball.index ? { ...el, start: true } : el
+            el.index === newBall.index ? { ...el, start: true } : el
           );
-        },
-        // repeat: -1,
-        // yoyo: true,
-      });
-      setTimeout(() => {
-        const number = Utils.randomNumber(1, 6);
-        //const number = 1;
+          this.numberBall += 1;
+          this.isNew = true;
+          this.currBall = this.numberBall;
+          const number = Utils.randomNumber(1, 6);
+          //const number = 1;
 
-        const ball = new Ball(
-          this,
-          centerX,
-          centerY,
-          "sport" + number,
-          this.numberBall,
-          1,
-          "sport" + number
-        );
-        this.balls.push(ball);
-        this.physicsBalls.add(ball);
-        this.ballsStat.push({
-          index: this.numberBall,
-          start: false,
-          sport: "sport" + number,
-          level: 1,
-        });
-      }, 100);
+          const ball = new Ball(
+            this,
+            centerX,
+            centerY,
+            "sport" + number,
+            this.numberBall,
+            1,
+            "sport" + number
+          );
+          this.balls.push(ball);
+          this.physicsBalls.add(ball);
+          this.ballsStat.push({
+            index: this.numberBall,
+            start: false,
+            sport: "sport" + number,
+            level: 1,
+          });
+        },
+      });
+      // setTimeout(() => {
+      //
+      // }, 100);
     });
 
     this.setCollisions();
@@ -150,17 +151,6 @@ export default class Game extends Phaser.Scene {
   move() {
     this.x = this.x + 15 * Math.cos(this.angle);
     this.y = this.y + 15 * Math.sin(this.angle);
-
-    this.lineTo(
-      this.cameras.main.centerX,
-      this.cameras.main.centerY,
-      this.x,
-      this.y
-    );
-  }
-
-  lineTo(x0: number, y0: number, x: number, y: number) {
-    //  this.cursor.setTo(x, y, x0, y0);
   }
 
   public update(): void {
@@ -169,31 +159,14 @@ export default class Game extends Phaser.Scene {
     } else {
       this.timeEnd = 0;
     }
-    if (this.timeEnd > 300) {
+    if (this.timeEnd > 100) {
       this.timeEnd = 0;
+      store.dispatch({ type: "game/setPoints", payload: this.points });
       store.dispatch({ type: "game/toggleEndGame" });
-      // this.scene.stop();
     }
+
     for (let i = 0; i < this.balls.length; i++) {
       if (this.ballsStat[i].start) {
-        if (!this.ballsStat[i].complete && this.ballsStat[i].level === 4) {
-          this.ballsStat[i].complete = true;
-          // console.log("LEVEL 4");
-          // console.log(this.ballsStat[i]);
-          const sport = Number(
-            this.ballsStat[i].sport.substr(this.ballsStat[i].sport.length - 1)
-          );
-          console.log(sport);
-          this.scene.pause();
-          store.dispatch({
-            type: "game/setData",
-            payload: {
-              level: 1,
-              sport: sport - 1,
-            },
-          });
-          store.dispatch({ type: "game/openPopup" });
-        }
         const speedDelta = 0.2;
         const period = speedDelta;
 
@@ -214,41 +187,46 @@ export default class Game extends Phaser.Scene {
         this.balls[i].x = x1;
         this.balls[i].y = y1;
         this.ballsStat[i].angle = angle1;
+
         this.balls[i].setCurrAngle(angle1);
       }
     }
     this.updateLevel();
   }
 
+  getIndex(arraySize: number, index: number) {
+    if (index >= arraySize) {
+      return index - arraySize;
+    } else return index;
+  }
+
   public updateLevel(): void {
-    const sortArray = [...this.ballsStat].sort(
-      (a, b) => parseFloat(a.angle) - parseFloat(b.angle)
+    const array = [...this.ballsStat].sort(
+      (a, b) => parseFloat(a.angle) - parseFloat(b.angle) //b.level - a.level ||
     );
 
-    for (let i = 0; i < this.balls.length; i++) {
+    const sortArray = [...array].filter(function (el) {
+      return el.start == true;
+    });
+
+    for (let i = 0; i < this.ballsStat.length; i++) {
+      if (sortArray.length < 3) return;
+
       const ball1 = sortArray[i];
-      const ball2 = sortArray[i + 1];
-      const ball3 = sortArray[i + 2];
+      const ball2 = sortArray[this.getIndex(sortArray.length, i + 1)];
+      const ball3 = sortArray[this.getIndex(sortArray.length, i + 2)];
 
       if (ball1?.start && ball2?.start && ball3?.start) {
-        if (ball1?.angle && ball2?.angle && ball3?.angle) {
-          if (
-            this.isInRange(ball1?.angle, ball3?.angle, ball2?.angle) &&
-            // this.is_P3_between_P1_and_P2(
-            //   ,
-            //   ,
-            //   ball3?.angle
-            // ) &&
-            ball1?.sport === ball2?.sport &&
-            ball1?.sport === ball3?.sport &&
-            ball2?.sport === ball3?.sport &&
-            ball1?.level === ball2?.level &&
-            ball1?.level === ball3?.level &&
-            ball2?.level === ball3?.level
-          ) {
-            // const b1 = this.balls[ball1.index - 1];
-            // const b2 = this.balls[ball2.index - 1];
-            // const b3 = this.balls[ball3.index - 1];
+        const isSport =
+          ball1.sport === ball2.sport &&
+          ball1.sport === ball3.sport &&
+          ball2.sport === ball3.sport;
+        const isLevel =
+          ball1.level === ball2.level &&
+          ball1.level === ball3.level &&
+          ball2.level === ball3.level;
+        if (isSport && isLevel) {
+          {
             const b1 = this.balls.find((b) => b.index === ball1.index);
             const b2 = this.balls.find((b) => b.index === ball2.index);
             const b3 = this.balls.find((b) => b.index === ball3.index);
@@ -271,10 +249,10 @@ export default class Game extends Phaser.Scene {
               targets: b1,
               y: y,
               x: x,
-              duration: 300,
+              duration: 250,
               ease: "Sine.easeIn",
               onComplete: () => {
-                b1.destroy();
+                b1?.destroy();
                 this.balls = this.balls.filter(function (obj) {
                   return obj.index !== ball1.index;
                 });
@@ -289,38 +267,57 @@ export default class Game extends Phaser.Scene {
               targets: b3,
               y: y,
               x: x,
-              duration: 300,
+              duration: 250,
               ease: "Sine.easeIn",
               onComplete: () => {
-                b3.destroy();
+                b3?.destroy();
                 this.balls = this.balls.filter(function (obj) {
                   return obj.index !== ball3.index;
                 });
-
                 this.ballsStat = this.ballsStat.filter(function (obj) {
                   return obj.index !== ball3.index;
                 });
+                if (level + 1 < 3 && this.createBall) {
+                  this.createBall = false;
+                  this.numberBall += 1;
+                  const ball = new Ball(
+                    this,
+                    x,
+                    y,
+                    name,
+                    this.numberBall,
+                    level + 1,
+                    name
+                  );
+                  ball.setCurrAngle(angle);
+                  this.balls.push(ball);
+                  this.physicsBalls.add(ball);
+                  this.ballsStat.push({
+                    index: this.numberBall,
+                    start: true,
+                    sport: name,
+                    level: level + 1,
+                    angle: angle,
+                    complete: false,
+                  });
+                } else {
+                  this.points += 1;
+                  const sport = Number(name.substr(name.length - 1));
 
-                this.numberBall += 1;
-                const ball = new Ball(
-                  this,
-                  x,
-                  y,
-                  name,
-                  this.numberBall,
-                  level + 1,
-                  name
-                );
-                ball.setCurrAngle(angle);
-                this.balls.push(ball);
-                this.physicsBalls.add(ball);
-                this.ballsStat.push({
-                  index: this.numberBall,
-                  start: true,
-                  sport: name,
-                  level: level + 1,
-                  angle: angle,
-                });
+                  const user = store.getState().game.user;
+                  if (user.cards[sport - 1].level < 3) {
+                    this.scene.pause();
+                    store.dispatch(upCard({ id: user.id, sport: sport - 1 }));
+                    store.dispatch({
+                      type: "game/setData",
+                      payload: {
+                        level: user.cards[sport - 1].level + 1,
+                        sport: sport - 1,
+                      },
+                    });
+                    store.dispatch({ type: "game/openPopup" });
+                  }
+                }
               },
             });
           }
@@ -329,19 +326,8 @@ export default class Game extends Phaser.Scene {
     }
   }
 
-  isInRange(from: number, to: number, angle: number) {
-    var _from = from % 360,
-      _to = to % 360,
-      _angle = angle % 360;
-    if (_from < 0) _from += 360; // (-500) % 360 === -140 :(
-    if (_to < 0) _to += 360;
-    if (_angle < 0) _angle += 360;
-    if (_from === _to) {
-      if (to > from) return true; // whole circle
-      return _angle === _from; // exact only
-    }
-    if (_to < _from) return _angle <= _to || from <= _angle; // _angle outside range
-    return _from <= _angle && _angle <= _to; // _angle inside range
+  isInRange(start: number, end: number, mid: number) {
+    return degreeCircle(mid).isAfter(start) && degreeCircle(end).isAfter(mid);
   }
 
   public setCollisions(): void {
@@ -351,30 +337,12 @@ export default class Game extends Phaser.Scene {
       (ball1: any, ball2: any) => {
         let a1, a2;
 
-        const ballAngle1 =
-          ball1.getCurrAngle() > 180
-            ? -360 + ball1.getCurrAngle()
-            : ball1.getCurrAngle();
-        const ballAngle2 =
-          ball2.getCurrAngle() > 180
-            ? -360 + ball2.getCurrAngle()
-            : ball2.getCurrAngle();
+        const b1 = this.ballsStat.find((b) => b.index === ball1.index);
+        const b2 = this.ballsStat.find((b) => b.index === ball2.index);
 
-        if (
-          (ballAngle1 >= 160 && ballAngle1 <= 180) ||
-          (ballAngle2 >= 162 && ballAngle2 <= 180)
-        ) {
-          return;
-        }
+        if (!b1.start || !b2.start) return;
 
-        if (
-          (ballAngle2 >= -162 && ballAngle1 <= -180) ||
-          (ballAngle1 >= -162 && ballAngle1 <= -180)
-        ) {
-          return;
-        }
-        console.log(ballAngle1, ballAngle2);
-        if (ballAngle1 < ballAngle2) {
+        if (degreeCircle(ball1.getCurrAngle()).isBefore(ball2.getCurrAngle())) {
           a1 = -1;
           a2 = 1;
         } else {
@@ -387,7 +355,7 @@ export default class Game extends Phaser.Scene {
         let angle1 = (180 / Math.PI) * Math.atan2(dY1, dX1);
         if (angle1 < 0) angle1 += 360;
 
-        angle1 = angle1 + 7 * a1;
+        angle1 = angle1 + 6 * a1;
 
         const x1 =
           this.cameras.main.centerX +
@@ -400,14 +368,13 @@ export default class Game extends Phaser.Scene {
           targets: ball1,
           y: y1,
           x: x1,
-          duration: 600,
+          duration: 750,
           ease: "Sine.easeOut",
           onComplete: () => {
             ball1.setCurrAngle(angle1);
             this.ballsStat = this.ballsStat.map((el) =>
               el.index === ball1.index ? { ...el, angle: angle1 } : el
             );
-            // this.ballsStat[ball1.index - 1].angle = angle1;
           },
         });
 
@@ -416,7 +383,7 @@ export default class Game extends Phaser.Scene {
         let angle2 = (180 / Math.PI) * Math.atan2(dY2, dX2);
         if (angle2 < 0) angle2 += 360;
 
-        angle2 = angle2 + 7 * a2;
+        angle2 = angle2 + 6 * a2;
 
         const x2 =
           this.cameras.main.centerX +
@@ -425,14 +392,11 @@ export default class Game extends Phaser.Scene {
           this.cameras.main.centerY +
           this.radius * Math.sin(angle2 * (Math.PI / 180));
 
-        // console.log(`x1 = ${ball1.x} y1 = ${ball1.y}`);
-        // console.log(`x2 = ${x} y2 = ${y}`);
-
         this.tweens.add({
           targets: ball2,
           y: y2,
           x: x2,
-          duration: 600,
+          duration: 750,
           ease: "Sine.easeOut",
           onComplete: () => {
             ball2.setCurrAngle(angle2);
@@ -441,8 +405,6 @@ export default class Game extends Phaser.Scene {
             );
           },
         });
-
-        return;
       }
     );
   }

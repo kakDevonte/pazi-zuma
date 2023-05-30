@@ -1,18 +1,25 @@
 import React from "react";
 import "./Rules.scss";
-import bg from "../../assets/image/bg-big.png";
 import logo from "../../assets/image/logo-rules.png";
 import { Button } from "../../components/Button";
 import { ButtonGray } from "../../components/ButtonGray";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { setPage } from "../../redux/game/slice";
+import { getUserById } from "../../redux/game/asyncActions";
 
 export const Rules: React.FC = () => {
   const dispatch = useAppDispatch();
   const page = useAppSelector((state) => state.game.page);
-
+  const user = useAppSelector((state) => state.game.user);
+  const bg = useAppSelector((state) => state.game.bg);
   const navigate = useNavigate();
+
+  React.useEffect(() => {
+    // @ts-ignore
+    const telegram = window["Telegram"]["WebApp"];
+    dispatch(getUserById(telegram.initDataUnsafe.user.id));
+  }, []);
 
   const getContent = (page: number) => {
     let content;
@@ -31,6 +38,7 @@ export const Rules: React.FC = () => {
             </div>
             <Button
               title={"Далее"}
+              disable={false}
               onClick={() => dispatch(setPage(page + 1))}
             />
           </>
@@ -52,6 +60,7 @@ export const Rules: React.FC = () => {
             </div>
             <Button
               title={"Далее"}
+              disable={false}
               onClick={() => dispatch(setPage(page + 1))}
             />
           </>
@@ -83,22 +92,34 @@ export const Rules: React.FC = () => {
                 <br />– ввести номер личного кабинета PARI.
               </p>
             </div>
-            <div className="rules-btn-container">
+            {user.personalNumber !== 0 ? (
               <Button
-                title={"Авторизоваться"}
-                onClick={() => {
-                  navigate("/auth");
-                }}
-              />
-              <ButtonGray
-                title={"Пропустить"}
-                disabled={false}
+                title={"Далее"}
+                disable={false}
                 onClick={() => {
                   navigate("/main");
                   dispatch(setPage(1));
                 }}
               />
-            </div>
+            ) : (
+              <div className="rules-btn-container">
+                <Button
+                  title={"Авторизоваться"}
+                  disable={false}
+                  onClick={() => {
+                    navigate("/auth");
+                  }}
+                />
+                <ButtonGray
+                  title={"Пропустить"}
+                  disabled={false}
+                  onClick={() => {
+                    navigate("/main");
+                    dispatch(setPage(1));
+                  }}
+                />
+              </div>
+            )}
           </>
         );
         break;
@@ -109,11 +130,9 @@ export const Rules: React.FC = () => {
 
   return (
     <div className="root rules">
-      <img className="bg" src={bg} alt="bg" />
+      <img className="bg" src={bg.normal} alt="bg" />
       <img className="rules-logo" src={logo} alt="logo" />
       {getContent(page)}
-      <div className="rules-top"></div>
-      <div className="rules-bot"></div>
     </div>
   );
 };

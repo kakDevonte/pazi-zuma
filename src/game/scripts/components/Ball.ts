@@ -15,7 +15,7 @@ class Ball extends Phaser.Physics.Arcade.Sprite {
     this.index = index;
     this.name = name;
     this.level = level;
-    this.value = image === "sport2" ? 3 : 0;
+    this.value = image === "sport2" ? 5 : 0;
     this.init();
   }
 
@@ -30,10 +30,10 @@ class Ball extends Phaser.Physics.Arcade.Sprite {
     this.scene.add.existing(this);
     this.scene.physics.add.existing(this);
 
-    this.setScale(0.3);
+    this.setScale(1.1);
     this.setName("ball" + this.index);
-    //this.setSize(145, 145);
-    this.setCircle(64);
+    //this.setSize(45, 45);
+    this.setCircle(32);
 
     this.text = this.scene.add
       .text(
@@ -41,7 +41,7 @@ class Ball extends Phaser.Physics.Arcade.Sprite {
         this.getBounds().centerY - this.value,
         `${this.level}`,
         {
-          font: "24px Montserrat ExtraBoldItalic",
+          font: "32px Montserrat ExtraBoldItalic",
           color: "rgb(255,255,255)",
           align: "center",
         }

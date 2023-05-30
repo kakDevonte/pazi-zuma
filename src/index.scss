@@ -4,7 +4,13 @@
 
 body {
     position: fixed;
+    @media screen and (-webkit-min-device-pixel-ratio: 0) {
+        select:focus, textarea:focus, input:focus {
+            font-size: 16px;
+        }
+    }
 }
+
 
 div, p, span, h1, h2, h3, h4, img {
     -moz-user-select: -moz-none;
@@ -55,6 +61,10 @@ canvas {
 @font-face {
     font-family: "Montserrat SemiBold";
     src: url("./assets/fonts/Montserrat-SemiBold.ttf");
+}
+@font-face {
+    font-family: "Montserrat SemiBold Italic";
+    src: url("./assets/fonts/montserrat-semibold-italic.ttf");
 }
 @font-face {
     font-family: "Montserrat";

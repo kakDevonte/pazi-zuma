@@ -2,7 +2,7 @@ class Settings {
   public readonly sizes = {
     width: 720,
     minHeight: 911,
-    maxHeight: 1240,
+    maxHeight: 1620,
   };
   private _mobile: boolean = false;
 

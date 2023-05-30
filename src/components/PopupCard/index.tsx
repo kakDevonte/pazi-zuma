@@ -19,7 +19,7 @@ export const PopupCard: React.FC<{ onClick: () => void }> = ({ onClick }) => {
           />
         </div>
         <p className="text">{data[sport].levels[level - 1].text}</p>
-        <Button title={"Далее"} onClick={onClick} />
+        <Button title={"Далее"} disable={false} onClick={onClick} />
       </div>
     </div>
   );

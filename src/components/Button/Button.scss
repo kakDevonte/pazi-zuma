@@ -2,7 +2,7 @@
   border: 2px solid #ffffff;
   width: 100%;
   border-radius: 35px;
-  padding: 0.9em;
+  padding: 0.9em 0.1em;
   font-family: Montserrat ExtraBoldItalic;
   font-size: 1.1em;
   color: #ffffff;
@@ -19,4 +19,9 @@
   &:active {
     transform: scale(.95);
   }
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }

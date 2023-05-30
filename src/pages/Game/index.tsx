@@ -3,24 +3,38 @@ import { IonPhaser } from "@ion-phaser/react";
 import { config } from "../../game/scripts";
 
 import "./Game.scss";
-import bg from "../../assets/image/bg-game-big.png";
 import circle from "../../assets/image/circle.png";
 import logo from "../../assets/image/logo-game.png";
 import btn from "../../assets/image/btn-pause.png";
 import { PopupGame } from "../../components/PopupGame";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
-import { closePopup, openPopup } from "../../redux/game/slice";
+import { closePopup, openPopup, setPoints } from "../../redux/game/slice";
 import { PopupCard } from "../../components/PopupCard";
 import { Navigate } from "react-router-dom";
+import { getUserById, spentTry } from "../../redux/game/asyncActions";
 
 export const Game: React.FC = () => {
   const isOpen = useAppSelector((state) => state.game.isOpen);
+  const user = useAppSelector((state) => state.game.user);
   const isEndGame = useAppSelector((state) => state.game.isEndGame);
-  const [timer, setTimer] = React.useState<number>(3);
+  const bg = useAppSelector((state) => state.game.bg);
+
+  const [time, setTimer] = React.useState<number>(3);
   const dispatch = useAppDispatch();
   const [isOpenPopup, setIsOpenPopup] = React.useState<boolean>(false);
   const gameRef = React.useRef(null); //<React.Ref<HTMLIonPhaserElement> | undefined>
   let phaserGameObject: any;
+
+  React.useEffect(() => {
+    // @ts-ignore
+    const telegram = window["Telegram"]["WebApp"];
+    // // dispatch(getUserById(telegram.initDataUnsafe.user.id));
+    dispatch(spentTry(telegram.initDataUnsafe.user.id));
+  }, []);
+
+  React.useEffect(() => {
+    dispatch(setPoints(0));
+  }, []);
 
   React.useEffect(() => {
     const timer = setInterval(() => {
@@ -58,15 +72,15 @@ export const Game: React.FC = () => {
 
   return (
     <>
-      {timer > 0 && (
+      {time > 0 && (
         <div className="timer">
-          <h1 className="timer-text">{timer}</h1>
+          <h1 className="timer-text">{time}</h1>
         </div>
       )}
       {isOpen && <PopupCard onClick={onClickNextGame} />}
       {isOpenPopup && <PopupGame onClick={onClickResume} />}
       <div className="game-root">
-        <img className="bg" src={bg} alt="bg" />
+        <img className="bg" src={bg.game} alt="bg" />
         <img className="game-logo" src={logo} alt="logo" />
         <img
           className="game-button"

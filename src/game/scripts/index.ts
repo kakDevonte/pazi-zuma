@@ -11,15 +11,16 @@ const gcd = (num1: number, num2: number): number => {
   return num1;
 };
 
-const clientHeight = Math.round(document.body.clientHeight);
-const clientWidth = Math.round(document.body.clientWidth);
-let canvasWidth = Settings.sizes.width;
+const clientHeight = Math.round(window.innerHeight);
+const clientWidth = Math.round(window.innerWidth);
+const canvasWidth = Settings.sizes.width;
+
 let canvasHeight = Math.round(
   (Settings.sizes.width * clientHeight) / clientWidth
 );
+
 let width = 0;
 let height = 0;
-console.log(canvasHeight);
 
 if (canvasHeight > Settings.sizes.maxHeight)
   canvasHeight = Settings.sizes.maxHeight;
@@ -40,9 +41,9 @@ if (clientHeight / y > clientWidth / x) {
   width = (clientHeight / y) * x;
   height = clientHeight;
 }
-canvasHeight = window.innerHeight;
-canvasWidth = window.innerWidth;
-console.log(canvasWidth, canvasHeight);
+//canvasHeight = window.innerHeight;
+
+//canvasWidth = window.innerWidth;
 
 export const config: Phaser.Types.Core.GameConfig = {
   type: Settings.isMobile() ? Phaser.CANVAS : Phaser.AUTO,

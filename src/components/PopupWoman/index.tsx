@@ -19,7 +19,7 @@ export const PopupWoman: React.FC<{
           />
         </div>
         <p className="text">{data[sport].levels[level - 1].text}</p>
-        <Button title={"Назад"} onClick={onClick} />
+        <Button title={"Назад"} disable={false} onClick={onClick} />
       </div>
     </div>
   );

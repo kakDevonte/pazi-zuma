@@ -21,7 +21,7 @@ export const PopupGame: React.FC<{ onClick: () => void }> = ({ onClick }) => {
         </p>
       </div>
       <div className="game-popup-btn-container">
-        <Button title={"Продолжить"} onClick={onClick} />
+        <Button title={"Продолжить"} disable={false} onClick={onClick} />
         <ButtonGray
           title={"В меню"}
           disabled={false}

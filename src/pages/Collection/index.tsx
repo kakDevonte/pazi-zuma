@@ -1,24 +1,28 @@
 import React from "react";
 import "./Collection.scss";
-import bg from "../../assets/image/bg-big.png";
 import logo from "../../assets/image/logo-carts.png";
 import { Button } from "../../components/Button";
 import { useNavigate } from "react-router-dom";
 import { Card } from "../../components/Card";
-
-import fencing from "../../assets/image/woman/icon/fencing-woman.png";
-import hockey from "../../assets/image/woman/icon/hockey-woman.png";
-import skates from "../../assets/image/woman/icon/skates-woman.png";
-import skis from "../../assets/image/woman/icon/skis-woman.png";
-import tennis from "../../assets/image/woman/icon/tennis-woman.png";
-import volleyball from "../../assets/image/woman/icon/volleyball-woman.png";
 import { PopupWoman } from "../../components/PopupWoman";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { data } from "../../utils/women";
+import { getUserById } from "../../redux/game/asyncActions";
 
 export const Collection: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const bg = useAppSelector((state) => state.game.bg);
+  const user = useAppSelector((state) => state.game.user);
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
   const [sport, setSport] = React.useState<number>(0);
   const [level, setLevel] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    // @ts-ignore
+    const telegram = window["Telegram"]["WebApp"];
+    dispatch(getUserById(telegram.initDataUnsafe.user.id));
+  }, []);
 
   const onClickCard = (sport: number, level: number) => {
     if (level === 0) return;
@@ -37,23 +41,69 @@ export const Collection: React.FC = () => {
         />
       )}
       <div className="root cards">
-        <img className="bg" src={bg} alt="bg" />
+        <img className="bg" src={bg.normal} alt="bg" />
         <img className="cards-logo" src={logo} alt="logo" />
         <div className="cards-content">
-          <Card image={tennis} level={3} onClick={() => onClickCard(0, 3)} />
-          <Card image={skis} level={2} onClick={() => onClickCard(1, 2)} />
           <Card
-            image={volleyball}
-            level={0}
-            onClick={() => onClickCard(2, 0)}
+            image={
+              data[0].levels[
+                user.cards[0].level - 1 <= 0 ? 0 : user.cards[0].level - 1
+              ].logo
+            }
+            level={user.cards[0].level}
+            onClick={() => onClickCard(0, user.cards[0].level)}
           />
-          <Card image={skates} level={0} onClick={() => onClickCard(3, 0)} />
-          <Card image={fencing} level={1} onClick={() => onClickCard(4, 1)} />
-          <Card image={hockey} level={0} onClick={() => onClickCard(5, 0)} />
+          <Card
+            image={
+              data[1].levels[
+                user.cards[1].level - 1 <= 0 ? 0 : user.cards[1].level - 1
+              ].logo
+            }
+            level={user.cards[1].level}
+            onClick={() => onClickCard(1, user.cards[1].level)}
+          />
+          <Card
+            image={
+              data[2].levels[
+                user.cards[2].level - 1 <= 0 ? 0 : user.cards[2].level - 1
+              ].logo
+            }
+            level={user.cards[2].level}
+            onClick={() => onClickCard(2, user.cards[2].level)}
+          />
+          <Card
+            image={
+              data[3].levels[
+                user.cards[3].level - 1 <= 0 ? 0 : user.cards[3].level - 1
+              ].logo
+            }
+            level={user.cards[3].level}
+            onClick={() => onClickCard(3, user.cards[3].level)}
+          />
+          <Card
+            image={
+              data[4].levels[
+                user.cards[4].level - 1 <= 0 ? 0 : user.cards[4].level - 1
+              ].logo
+            }
+            level={user.cards[4].level}
+            onClick={() => onClickCard(4, user.cards[4].level)}
+          />
+          <Card
+            image={
+              data[5].levels[
+                user.cards[5].level - 1 <= 0 ? 0 : user.cards[5].level - 1
+              ].logo
+            }
+            level={user.cards[5].level}
+            onClick={() => onClickCard(5, user.cards[5].level)}
+          />
         </div>
-        <Button title={"Назад"} onClick={() => navigate("/main")} />
-        <div className="cards-top"></div>
-        <div className="cards-bot"></div>
+        <Button
+          title={"Назад"}
+          disable={false}
+          onClick={() => navigate("/main")}
+        />
       </div>
     </>
   );

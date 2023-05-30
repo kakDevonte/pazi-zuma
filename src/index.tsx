@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import "./index.css";
+import "./index.scss";
 import App from "./App";
 import { Provider } from "react-redux";
 import { store } from "./redux/store";
@@ -14,3 +14,7 @@ root.render(
     <App />
   </Provider>
 );
+
+// if (process.env.NODE_ENV === "development") {
+//import("./eruda").then(({ default: eruda }) => {}); //runtime download
+// }

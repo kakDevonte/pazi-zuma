@@ -1,24 +1,36 @@
 import React from "react";
 import "./Auth.scss";
-import bg from "../../assets/image/bg-big.png";
 import logo from "../../assets/image/logo-auth.png";
-import { Button } from "../../components/Button";
 import { ButtonGray } from "../../components/ButtonGray";
 import { Input } from "../../components/Input";
 import { useNavigate } from "react-router-dom";
+import { ButtonLink } from "../../components/ButtonLink";
+import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { setUserNumber } from "../../redux/game/asyncActions";
+import { setPage } from "../../redux/game/slice";
 
 export const Auth: React.FC = () => {
   const [number, setNumber] = React.useState<string>("");
+  const user = useAppSelector((state) => state.game.user);
+  const bg = useAppSelector((state) => state.game.bg);
+
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const toggleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value.length > 8) return;
     setNumber(e.target.value.replace(/\D/, ""));
   };
 
+  const setPersonalNumber = () => {
+    dispatch(setUserNumber({ id: user.id, personalNumber: number }));
+    dispatch(setPage(1));
+    navigate("/main");
+  };
+
   return (
     <div className="root auth">
-      <img className="bg" src={bg} alt="bg" />
+      <img className="bg" src={bg.normal} alt="bg" />
       <img className="auth-logo" src={logo} alt="logo" />
       <div className="container">
         <p className="text">
@@ -28,7 +40,7 @@ export const Auth: React.FC = () => {
         </p>
       </div>
       <div className="auth-btns">
-        <Button title={"Регистрация"} onClick={() => {}} />
+        <ButtonLink title={"Регистрация"} />
         <div className="auth-btn-container">
           <Input
             value={number}
@@ -37,7 +49,7 @@ export const Auth: React.FC = () => {
           <ButtonGray
             title={"Готово"}
             disabled={number.length < 8}
-            onClick={() => {}}
+            onClick={setPersonalNumber}
           />
         </div>
         <ButtonGray
@@ -48,8 +60,6 @@ export const Auth: React.FC = () => {
           }}
         />
       </div>
-      <div className="auth-top"></div>
-      <div className="auth-bot"></div>
     </div>
   );
 };
